@@ -24,6 +24,9 @@ export class PostsService {
 
     async createPostWithParams(post: Omit<PostCreateModel, 'blogId'>, blogId: string): Promise<string> {
         const findedBlog = await this.blogsService.findBlogById(blogId)
+        if (!findedBlog) {
+            throw new NotFoundException("Post not found")
+        }
         const newPost = new this.postModel({...post, blogName: findedBlog?.name, blogId: findedBlog?.id})
         const saveData = await this.postsRepository.savePost(newPost)
         return saveData._id.toString()
