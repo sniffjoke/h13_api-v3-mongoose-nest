@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
 import {ConfigModule} from "@nestjs/config";
 import {MongooseModule} from "@nestjs/mongoose";
-import {SETTINGS} from "./infrastructure/settings/settings";
+import {BlogsModule} from "./features/blogs/blogs.module";
+import {PostsModule} from "./features/posts/posts.module";
 
 @Module({
   imports: [
       ConfigModule.forRoot({
-          envFilePath: '.development.env'
+          envFilePath: '.development.env',
       }),
-      MongooseModule.forRoot(SETTINGS.PATH.MONGODB as string),
+      MongooseModule.forRoot(process.env.MONGO_URI as string),
+      BlogsModule,
+      PostsModule
   ],
   controllers: [],
   providers: [],

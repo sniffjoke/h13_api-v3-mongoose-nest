@@ -11,5 +11,6 @@ async function bootstrap() {
     // credentials: true,
   }))
   await app.listen(SETTINGS.PORT, () => console.log('DB connect'));
+  // app.use(cookieParser())
 }
 bootstrap();
