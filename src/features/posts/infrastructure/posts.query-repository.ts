@@ -3,12 +3,14 @@ import {InjectModel} from "@nestjs/mongoose";
 import {Post} from "../domain/posts.entity";
 import {HydratedDocument, Model} from "mongoose";
 import {PostViewModel} from "../api/models/output/post.view.model";
+import {Blog} from "../../blogs/domain/blogs.entity";
 
 
 @Injectable()
 export class PostsQueryRepository {
     constructor(
-        @InjectModel(Post.name) private readonly postModel: Model<Post>
+        @InjectModel(Post.name) private readonly postModel: Model<Post>,
+        @InjectModel(Blog.name) private readonly blogModel: Model<Blog>
     ) {
     }
 
@@ -17,8 +19,12 @@ export class PostsQueryRepository {
         return posts.map(post => this.postOutputMap(post as HydratedDocument<PostViewModel>))
     }
 
-    async getAllPostsByBlogId(id: string): Promise<PostViewModel[]> {
-        const posts = await this.postModel.find({blogId: id})
+    async getAllPostsByBlogId(blogId: string): Promise<PostViewModel[]> {
+        const blog = await this.blogModel.findById(blogId)
+        if (!blog) {
+            throw new NotFoundException("Blog not found")
+        }
+        const posts = await this.postModel.find({blogId})
         return posts.map(post => this.postOutputMap(post as HydratedDocument<PostViewModel>))
     }
 
