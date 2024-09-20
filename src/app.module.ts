@@ -5,6 +5,7 @@ import {BlogsModule} from "./features/blogs/blogs.module";
 import {PostsModule} from "./features/posts/posts.module";
 import {UsersModule} from "./features/users/users.module";
 import {CommentsModule} from "./features/comments/comments.module";
+import {TestingModule} from "./features/testing/testing.module";
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import {CommentsModule} from "./features/comments/comments.module";
       BlogsModule,
       PostsModule,
       UsersModule,
-      CommentsModule
+      CommentsModule,
+      TestingModule
   ],
   controllers: [],
   providers: [],
