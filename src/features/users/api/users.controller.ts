@@ -1,0 +1,33 @@
+import {Body, Controller, Get, Param, Post} from '@nestjs/common';
+import {UsersService} from "../application/users.service";
+import {UsersQueryRepository} from "../infrastructure/users.query-repository";
+import {UserCreateModel} from "./models/input/create-user.input.model";
+import {UserViewModel} from "./models/output/user.view.model";
+
+@Controller('users')
+export class UsersController {
+    constructor(
+        private readonly usersService: UsersService,
+        private readonly usersQueryRepository: UsersQueryRepository,
+    ) {}
+
+    @Get()
+    async getAllUsers(): Promise<UserViewModel[]> {
+        const users = await this.usersQueryRepository.getAllUsers()
+        return users
+    }
+
+    @Post()
+    async createUser(@Body() dto: UserCreateModel): Promise<UserViewModel> {
+        const userId = await this.usersService.createUser(dto)
+        const newUser = await this.usersQueryRepository.userOutput(userId)
+        return newUser
+    }
+
+    @Get(':id')
+    async getUserById(@Param('id') id: string): Promise<UserViewModel> {
+        const user = await this.usersQueryRepository.userOutput(id)
+        return user
+    }
+
+}

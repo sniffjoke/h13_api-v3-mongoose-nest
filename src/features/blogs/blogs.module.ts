@@ -22,6 +22,14 @@ import {PostsQueryRepository} from "../posts/infrastructure/posts.query-reposito
         }]),
     ],
     controllers: [BlogsController],
-    providers: [BlogsService, BlogsRepository, BlogsQueryRepository, PostsService, PostsRepository, PostsQueryRepository],
+    providers: [
+        BlogsService,
+        BlogsRepository,
+        BlogsQueryRepository,
+        PostsService,
+        PostsRepository,
+        PostsQueryRepository
+    ],
 })
-export class BlogsModule {}
+export class BlogsModule {
+}

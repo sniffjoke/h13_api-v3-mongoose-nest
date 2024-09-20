@@ -18,7 +18,7 @@ export class PostsQueryRepository {
     }
 
     async getAllPostsByBlogId(id: string): Promise<PostViewModel[]> {
-        const posts = await this.postModel.find({blogId:id})
+        const posts = await this.postModel.find({blogId: id})
         return posts.map(post => this.postOutputMap(post as HydratedDocument<PostViewModel>))
     }
 
@@ -42,6 +42,6 @@ export class PostsQueryRepository {
             extendedLikesInfo,
             createdAt
         }
-}
+    }
 
 }

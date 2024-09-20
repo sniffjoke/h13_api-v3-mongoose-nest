@@ -43,4 +43,9 @@ export class PostsService {
         return deletePost
     }
 
+    async findPostById(id: string) {
+        const findedPost = await this.postModel.findById(id)
+        return findedPost
+    }
+
 }

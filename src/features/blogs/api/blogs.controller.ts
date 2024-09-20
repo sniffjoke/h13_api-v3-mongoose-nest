@@ -26,14 +26,14 @@ export class BlogsController {
     @Post()
     async createBlog(@Body() dto: BlogCreateModel): Promise<BlogViewModel> {
         const blogId = await this.blogsService.createBlog(dto)
-        const blogOutput = await this.blogsQueryRepository.blogOutput(blogId)
-        return blogOutput
+        const newBlog = await this.blogsQueryRepository.blogOutput(blogId)
+        return newBlog
     }
 
     @Get(':id')
     async getBlogById(@Param('id') id: string): Promise<BlogViewModel> {
-        const blogOutput = await this.blogsQueryRepository.blogOutput(id)
-        return blogOutput
+        const blog = await this.blogsQueryRepository.blogOutput(id)
+        return blog
     }
 
     @Put(':id')
