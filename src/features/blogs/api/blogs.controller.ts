@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, HttpCode, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query} from '@nestjs/common';
 import {BlogsService} from "../application/blogs.service";
 import {BlogsQueryRepository} from "../infrastructure/blogs.query-repository";
 import {BlogCreateModel} from "./models/input/create-blog.input.model";
@@ -18,9 +18,9 @@ export class BlogsController {
     ) {}
 
     @Get()
-    async getAll(): Promise<BlogViewModel[]> {
-        const blogs = await this.blogsQueryRepository.getAllBlogs()
-        return blogs
+    async getAll(@Query() query: any) {
+        const blogsWithQuery = await this.blogsQueryRepository.getAllBlogsWithQuery(query)
+        return blogsWithQuery
     }
 
     @Post()

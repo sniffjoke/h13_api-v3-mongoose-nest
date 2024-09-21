@@ -3,6 +3,7 @@ import {Blog} from "../domain/blogs.entity";
 import {HydratedDocument, Model} from "mongoose";
 import {InjectModel} from "@nestjs/mongoose";
 import {BlogViewModel} from "../api/models/output/blog.view.model";
+import {PaginationBaseModel} from "../../../infrastructure/base/pagination.base.model";
 
 
 @Injectable()
@@ -12,12 +13,39 @@ export class BlogsQueryRepository {
     ) {
     }
 
-    async getAllBlogs(): Promise<BlogViewModel[]> {
+    async getAllBlogs(query: any): Promise<BlogViewModel[]> {
         const blogs = await this.BlogModel.find()
         return blogs.map(blog => this.blogOutputMap(blog as HydratedDocument<BlogViewModel>))
     }
 
-    k
+    async getAllBlogsWithQuery(query: any) {
+        const generateQuery = await this.generateQuery(query)
+        const items = await this.BlogModel
+            .find(generateQuery.filterName)
+            .sort({[generateQuery.sortBy]: generateQuery.sortDirection})
+            .limit(generateQuery.pageSize)
+            .skip((generateQuery.page - 1) * generateQuery.pageSize)
+        const resultBlogs = new PaginationBaseModel<BlogViewModel>(generateQuery, items)
+        return resultBlogs
+    }
+
+    private async generateQuery(query: any) {
+        const queryName: string = query.searchNameTerm ? query.searchNameTerm : ''
+        const filterName = {name: {$regex: queryName, $options: "i"}}
+        const totalCount = await this.BlogModel.countDocuments(filterName)
+        const pageSize = query.pageSize ? +query.pageSize : 10
+        const pagesCount = Math.ceil(totalCount / pageSize)
+        return {
+            totalCount,
+            pageSize,
+            pagesCount,
+            page: query.pageNumber ? Number(query.pageNumber) : 1,
+            sortBy: query.sortBy ? query.sortBy : 'createdAt',
+            sortDirection: query.sortDirection ? query.sortDirection : 'desc',
+            queryName,
+            filterName
+        }
+    }
 
     async blogOutput(id: string): Promise<BlogViewModel> {
         const blog = await this.BlogModel.findById(id)

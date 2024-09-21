@@ -42,12 +42,19 @@ export class PostsService {
     }
 
     async deletePost(id: string) {
+        const findedPost = await this.postModel.findById(id)
+        if (!findedPost) {
+            throw new NotFoundException(`Post with id ${id} not found`)
+        }
         const deletePost = await this.postModel.deleteOne({_id: id})
         return deletePost
     }
 
     async findPostById(id: string) {
         const findedPost = await this.postModel.findById(id)
+        if (!findedPost) {
+            throw new NotFoundException(`Post with id ${id} not found`)
+        }
         return findedPost
     }
 
