@@ -25,7 +25,8 @@ export class BlogsQueryRepository {
             .sort({[generateQuery.sortBy]: generateQuery.sortDirection})
             .limit(generateQuery.pageSize)
             .skip((generateQuery.page - 1) * generateQuery.pageSize)
-        const resultBlogs = new PaginationBaseModel<BlogViewModel>(generateQuery, items)
+        const itemsOutput = items.map(item => this.blogOutputMap(item as HydratedDocument<BlogViewModel>))
+        const resultBlogs = new PaginationBaseModel<BlogViewModel>(generateQuery, itemsOutput)
         return resultBlogs
     }
 
