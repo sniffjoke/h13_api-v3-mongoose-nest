@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, Param, Post, Query} from '@nestjs/common';
 import {UsersService} from "../application/users.service";
 import {UsersQueryRepository} from "../infrastructure/users.query-repository";
 import {UserCreateModel} from "./models/input/create-user.input.model";
@@ -32,6 +32,7 @@ export class UsersController {
     }
 
     @Delete(':id')
+    @HttpCode(204)
     async deleteUser(@Param('id') id: string) {
         const user = await this.usersService.deleteUser(id)
         return user
