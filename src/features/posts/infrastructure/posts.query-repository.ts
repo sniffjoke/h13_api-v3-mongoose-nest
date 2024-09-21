@@ -31,6 +31,12 @@ export class PostsQueryRepository {
 
     async getAllPostsWithQuery(query: any, blogId?: string): Promise<PaginationBaseModel<PostViewModel>> {
         const generateQuery = await this.generateQuery(query)
+        if (blogId) {
+            const blog = await this.blogModel.findById(blogId)
+            if (!blog) {
+                throw new NotFoundException("Blog not found")
+            }
+        }
         const blogIdFilter = blogId ? {blogId} : {}
         const items = await this.postModel
             .find(blogIdFilter)
