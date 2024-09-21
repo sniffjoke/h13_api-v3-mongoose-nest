@@ -58,8 +58,8 @@ export class BlogsController {
     }
 
     @Get(':id/posts')
-    async getAllPostsByBlogId(@Param('id') id: string) {
-        const posts = await this.postsQueryRepository.getAllPostsByBlogId(id)
+    async getAllPostsByBlogId(@Param('id') id: string, @Query() query: any) {
+        const posts = await this.postsQueryRepository.getAllPostsWithQuery(query, id)
         return posts
     }
 

@@ -4,6 +4,7 @@ import {Post} from "../domain/posts.entity";
 import {HydratedDocument, Model} from "mongoose";
 import {PostViewModel} from "../api/models/output/post.view.model";
 import {Blog} from "../../blogs/domain/blogs.entity";
+import {PaginationBaseModel} from "../../../infrastructure/base/pagination.base.model";
 
 
 @Injectable()
@@ -14,18 +15,45 @@ export class PostsQueryRepository {
     ) {
     }
 
-    async getAllPosts(): Promise<PostViewModel[]> {
-        const posts = await this.postModel.find()
-        return posts.map(post => this.postOutputMap(post as HydratedDocument<PostViewModel>))
+    // async getAllPosts(): Promise<PostViewModel[]> {
+    //     const posts = await this.postModel.find()
+    //     return posts.map(post => this.postOutputMap(post as HydratedDocument<PostViewModel>))
+    // }
+    //
+    // async getAllPostsByBlogId(blogId: string): Promise<PostViewModel[]> {
+    //     const blog = await this.blogModel.findById(blogId)
+    //     if (!blog) {
+    //         throw new NotFoundException("Blog not found")
+    //     }
+    //     const posts = await this.postModel.find({blogId})
+    //     return posts.map(post => this.postOutputMap(post as HydratedDocument<PostViewModel>))
+    // }
+
+    async getAllPostsWithQuery(query: any, blogId?: string): Promise<PaginationBaseModel<PostViewModel>> {
+        const generateQuery = await this.generateQuery(query)
+        const blogIdFilter = blogId ? {blogId} : {}
+        const items = await this.postModel
+            .find(blogIdFilter)
+            .sort({[generateQuery.sortBy]: generateQuery.sortDirection})
+            .limit(generateQuery.pageSize)
+            .skip((generateQuery.page - 1) * generateQuery.pageSize)
+        const itemsOutput = items.map(item => this.postOutputMap(item as HydratedDocument<PostViewModel>))
+        const resultPosts = new PaginationBaseModel<PostViewModel>(generateQuery, itemsOutput)
+        return resultPosts
     }
 
-    async getAllPostsByBlogId(blogId: string): Promise<PostViewModel[]> {
-        const blog = await this.blogModel.findById(blogId)
-        if (!blog) {
-            throw new NotFoundException("Blog not found")
+    private async generateQuery(query: any) {
+        const totalCount = await this.postModel.countDocuments()
+        const pageSize = query.pageSize ? +query.pageSize : 10
+        const pagesCount = Math.ceil(totalCount / pageSize)
+        return {
+            totalCount,
+            pageSize,
+            pagesCount,
+            page: query.pageNumber ? Number(query.pageNumber) : 1,
+            sortBy: query.sortBy ? query.sortBy : 'createdAt',
+            sortDirection: query.sortDirection ? query.sortDirection : 'desc',
         }
-        const posts = await this.postModel.find({blogId})
-        return posts.map(post => this.postOutputMap(post as HydratedDocument<PostViewModel>))
     }
 
     async postOutput(id: string): Promise<PostViewModel> {

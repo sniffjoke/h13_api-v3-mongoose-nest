@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, HttpCode, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query} from '@nestjs/common';
 import {PostCreateModel} from "./models/input/create-post.input.model";
 import {PostsService} from "../application/posts.service";
 import {PostViewModel} from "./models/output/post.view.model";
@@ -7,6 +7,7 @@ import {UpdateWriteOpResult} from "mongoose";
 import {CommentCreateModel} from "../../comments/api/models/input/create-comment.input.model";
 import {CommentsService} from "../../comments/application/comments.service";
 import {CommentsQueryRepository} from "../../comments/infrastructure/comments.query-repository";
+import {PaginationBaseModel} from "../../../infrastructure/base/pagination.base.model";
 
 @Controller('posts')
 export class PostsController {
@@ -21,8 +22,8 @@ export class PostsController {
     }
 
     @Get()
-    async getAllPosts(): Promise<PostViewModel[]> {
-        const posts = await this.postsQueryRepository.getAllPosts()
+    async getAllPosts(@Query() query: any): Promise<PaginationBaseModel<PostViewModel>> {
+        const posts = await this.postsQueryRepository.getAllPostsWithQuery(query)
         return posts
     }
 

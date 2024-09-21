@@ -9,18 +9,18 @@ import {PaginationBaseModel} from "../../../infrastructure/base/pagination.base.
 @Injectable()
 export class BlogsQueryRepository {
     constructor(
-        @InjectModel(Blog.name) private readonly BlogModel: Model<Blog>
+        @InjectModel(Blog.name) private readonly blogModel: Model<Blog>
     ) {
     }
 
-    async getAllBlogs(query: any): Promise<BlogViewModel[]> {
-        const blogs = await this.BlogModel.find()
-        return blogs.map(blog => this.blogOutputMap(blog as HydratedDocument<BlogViewModel>))
-    }
+    // async getAllBlogs(query: any): Promise<BlogViewModel[]> {
+    //     const blogs = await this.blogModel.find()
+    //     return blogs.map(blog => this.blogOutputMap(blog as HydratedDocument<BlogViewModel>))
+    // }
 
     async getAllBlogsWithQuery(query: any) {
         const generateQuery = await this.generateQuery(query)
-        const items = await this.BlogModel
+        const items = await this.blogModel
             .find(generateQuery.filterName)
             .sort({[generateQuery.sortBy]: generateQuery.sortDirection})
             .limit(generateQuery.pageSize)
@@ -33,7 +33,7 @@ export class BlogsQueryRepository {
     private async generateQuery(query: any) {
         const queryName: string = query.searchNameTerm ? query.searchNameTerm : ''
         const filterName = {name: {$regex: queryName, $options: "i"}}
-        const totalCount = await this.BlogModel.countDocuments(filterName)
+        const totalCount = await this.blogModel.countDocuments(filterName)
         const pageSize = query.pageSize ? +query.pageSize : 10
         const pagesCount = Math.ceil(totalCount / pageSize)
         return {
@@ -49,7 +49,7 @@ export class BlogsQueryRepository {
     }
 
     async blogOutput(id: string): Promise<BlogViewModel> {
-        const blog = await this.BlogModel.findById(id)
+        const blog = await this.blogModel.findById(id)
         if (!blog) {
             throw new NotFoundException("Blog not found")
         }
