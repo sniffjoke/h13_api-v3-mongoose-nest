@@ -30,7 +30,7 @@ export class PostsQueryRepository {
     // }
 
     async getAllPostsWithQuery(query: any, blogId?: string): Promise<PaginationBaseModel<PostViewModel>> {
-        const generateQuery = await this.generateQuery(query)
+        const generateQuery = await this.generateQuery(query, blogId)
         if (blogId) {
             const blog = await this.blogModel.findById(blogId)
             if (!blog) {
@@ -48,8 +48,9 @@ export class PostsQueryRepository {
         return resultPosts
     }
 
-    private async generateQuery(query: any) {
-        const totalCount = await this.postModel.countDocuments()
+    private async generateQuery(query: any, blogId?: string) {
+        const blogIdFilter = blogId ? {blogId} : {}
+        const totalCount = await this.postModel.countDocuments(blogIdFilter)
         const pageSize = query.pageSize ? +query.pageSize : 10
         const pagesCount = Math.ceil(totalCount / pageSize)
         return {
