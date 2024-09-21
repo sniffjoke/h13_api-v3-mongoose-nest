@@ -21,7 +21,8 @@ export class UsersQueryRepository {
     async getAllUsersWithQuery(query: any): Promise<PaginationBaseModel<UserViewModel>> {
         const generateQuery = await this.generateQuery(query)
         const items = await this.userModel
-            .find(query.userParamsFilter)
+            .find(generateQuery.userParamsFilter)
+            // .find({$or: [{email: generateQuery.filterEmail}, {login: generateQuery.filterLogin}]})
             .sort({[generateQuery.sortBy]: generateQuery.sortDirection})
             .limit(generateQuery.pageSize)
             .skip((generateQuery.page - 1) * generateQuery.pageSize)
@@ -46,7 +47,9 @@ export class UsersQueryRepository {
             page: query.pageNumber ? Number(query.pageNumber) : 1,
             sortBy: query.sortBy ? query.sortBy : 'createdAt',
             sortDirection: query.sortDirection ? query.sortDirection : 'desc',
-            userParamsFilter
+            userParamsFilter,
+            filterLogin,
+            filterEmail
         }
     }
 
