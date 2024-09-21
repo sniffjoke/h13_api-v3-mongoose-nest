@@ -1,8 +1,9 @@
-import {Body, Controller, Get, Param, Post} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, Query} from '@nestjs/common';
 import {UsersService} from "../application/users.service";
 import {UsersQueryRepository} from "../infrastructure/users.query-repository";
 import {UserCreateModel} from "./models/input/create-user.input.model";
 import {UserViewModel} from "./models/output/user.view.model";
+import {PaginationBaseModel} from "../../../infrastructure/base/pagination.base.model";
 
 @Controller('users')
 export class UsersController {
@@ -12,8 +13,8 @@ export class UsersController {
     ) {}
 
     @Get()
-    async getAllUsers(): Promise<UserViewModel[]> {
-        const users = await this.usersQueryRepository.getAllUsers()
+    async getAllUsers(@Query() query: any): Promise<PaginationBaseModel<UserViewModel>> {
+        const users = await this.usersQueryRepository.getAllUsersWithQuery(query)
         return users
     }
 
